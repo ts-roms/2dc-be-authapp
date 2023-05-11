@@ -7,10 +7,14 @@ const router = express.Router();
 
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, firstName, lastName } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Please provide email and password' });
+    }
+
+    if (!firstName || !lastName) {
+      return res.status(400).json({ message: 'Please provide your Fullname' });
     }
 
     // check if email exists
@@ -24,7 +28,9 @@ router.post('/register', async (req: Request, res: Response) => {
 
     const user = new User({
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      firstName,
+      lastName
     });
 
     await user.save();
@@ -59,7 +65,7 @@ router.post('/login', async (req: Request, res: Response) => {
     // Create and sign a JWT
     const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '1h' });
 
-    res.json({ token });
+    res.json({ token, user });
 
   } catch (error) {
     console.error('Error in user login: ', error);
